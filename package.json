@@ -1,0 +1,25 @@
+{
+  "name": "chatapp",
+  "version": "1.0.0",
+  "description": "my simple chat app",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lite-server": "lite-server"
+  },
+  "keywords": [
+    "chat"
+  ],
+  "author": "Emma Dang",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^4.5.0",
+    "express": "^4.17.1",
+    "http-server": "^0.12.3",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "lite-server": "^2.5.4"
+  }
+}

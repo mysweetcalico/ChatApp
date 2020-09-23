@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content='width=device-width initial-scale=1 shrink-to-fit=no'>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <!-- CSS only -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <!-- font awesome -->
+    <script src="https://use.fontawesome.com/79f64b7d5b.js"></script>
+    <title>ChitChat</title>
+    <style>
+        body {
+            margin: 0px auto;
+            padding: 20px 0px 0px 0px;
+            z-index: 0;
+            font-family: "Rubic Light"; }
+        #nameError {
+            display: none;}
+        #chatDisplay {
+            height: 80vh;
+            padding: 15px 15px;
+            overflow: scroll; }
+        #msgToSelf {
+            background-color: #5cb85c;
+            color: #f9f9f9;
+            border-radius: 20px;
+            margin: 5px 15px;
+            padding: 5px 10px;}
+        #msgToOthers{
+            background-color: #e2e3e5;
+            color: #343a40;
+            border-radius: 20px;
+            margin: 5px 15px;
+            padding: 5px 10px;}
+        #msgField { padding-bottom: 5px;}
+        #whisper { 
+            background-color: #FFFBE6;
+            color: #FD5523;
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin: 6px;}
+        #error { color: #FD5523;
+            margin: 6px;
+            display: none;}
+        #notification {color: #FD5523;}
+        #privateMsgError {color: #FD5523;
+            display: none;}
+        #privateMsgWindow {display: none;
+            position: fixed;
+            bottom: 0px;
+            right: 0px;
+            border: 1px solid #a7b4aacc;
+            z-index: 10;}
+        #privateMsgDisplay {height: 300px;
+            width: 245px;
+            overflow: scroll;}
+        #typing div {font-style: italic;
+            margin: 5px 15px;
+            padding: 5px 10px;
+            color: #FD5523;}
+    </style>
+</head>
+
+<body> 
+    <div class='modal' tabindex="-1" role='dialog' id='nicknameModal'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-body'>
+                    <form id='nicknameField'>
+                        <div class='input-group'>
+                            <input type='text' class='form-control' placeholder="Your nickname" id='nameInput'>
+                            <div class='input-group-append'>
+                                <button class='btn btn-outline-success' type='submit'>Enter</a>
+                            </div>
+                        </div>
+                    </form>
+                    <div class='row' id='nameError'>
+                        <span class='col-12'>Nickname is empty or is taken! Try again.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<div class='container'>
+		<div class='row'>
+            <div class='col-12 col-md-4 order-md-2'>
+                <div class='row'>
+                    <div class='col-4 order-1 col-md-12 order-md-3 my-md-3'>
+                        <button type='button' class='btn btn-outline-success self' data-toggle='collapse' data-target='#usersCard'>
+                            Members <span class='badge badge-pill badge-success userNumber'></span>
+                        </button>
+                        <div class='collapse' id='usersCard'>
+                            <div class='list-group users'>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='col-4 order-3 col-md-12 order-md-1'>
+                        <div class='py-md-3' id='notification'>Notifications</div>
+                    </div>
+                    <div class='col-4 order-2 col-md-12 order-md-2 my-md-3'>
+                        <button class='btn btn-outline-warning' type='button' data-target='#privateMsgRequest' data-toggle='collapse' id='privateMsgButton'>Private Message</button>
+                        <div class='collapse my-2' id='privateMsgRequest'>
+                            <form>
+                                <div class='input-group'>
+                                    <div class='input-group-prepend'>
+                                        <span class='input-group-text'>To:</span>
+                                    </div>
+                                    <input type='text' class='form-control' placeholder="Member" id='privateRequestRecipient'>
+                                </div>
+                                <div id='privateMsgError' class='my-1'>Error! Please enter a valid member.</div>
+                            </form>
+                        </div>
+                    </div>
+                </div>     
+            </div>
+            <div class='col-12 col-md-8 order-md-1' id='chatDisplay'>
+            </div>
+        </div>
+        
+		<div class='row' id='msgField'>
+            <div class='col-12 col-md-8'>
+                <form id='inputForm'>
+                    <div class='input-group'>
+                        <input type='text' class='form-control' placeholder='message' id='inputMsg'>
+                        <div class='input-group-append'>
+                            <button class='btn btn-success' type='submit' id='msgSubmit'>
+                                <i class='fa fa-arrow-up'></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class='row' id='error'></div>
+
+    </div>
+
+    <!-- Private Msg Window -->
+    <div id='privateMsgWindow'>
+        <div class='container'>
+            <div class='row justify-content-between pl-2 bg-success text-white'>
+                <span id='privateMsgRecipient' class='align-self-center'>Recipient</span>
+                <button type='button' class='btn' id='privateMsgClose'>
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class='row bg-light'>
+                <div class='col-12' id='privateMsgDisplay'></div>
+            </div>
+            <div class='row bg-light'>
+                <form class='form-inline col-12 m-0 p-0' id='privateMsgForm'>
+                    <div class='input-group'>
+                        <input type='text' class='form-control' placeholder="message" id='privateMsgInput'>
+                        <div class='input-group-append'>
+                            <button class='btn btn-outline-success' type='submit'><i class='fa fa-arrow-up'></i></a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+
+	<!-- JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(document).ready(() => {
+            $('#nicknameModal').modal('show');
+
+            const socket = io.connect('/chat');
+            const nameField = $('#nicknameField');
+            const nameInput = $('#nameInput');
+            const nameError = $('#nameError');
+            const msgField = $('#inputForm');
+            const msg = $('#inputMsg');
+            const chatDisplay = $('#chatDisplay');
+            const privateMsgRequest = $('#privateMsgRequest');
+            const recipientInput = $('#privateRequestRecipient');
+            const privateMsgError = $('#privateMsgError');
+            const privateMsgButton = $('#privateMsgButton');
+            const privateMsg = $('#privateMsgInput');
+            const privateMsgDisplay = $('#privateMsgDisplay');
+            const privateMsgClose = $('#privateMsgClose');
+            const privateMsgForm = $('#privateMsgForm');
+            const privateMsgWindow = $('#privateMsgWindow');
+            const recipient = $('#privateMsgRecipient');
+
+            nameInput.focus();
+
+            nameField.on('submit', (event) => {
+                event.preventDefault();
+                socket.emit('new user', nameInput.val(), (data) => {
+                    if (data) {
+                        nameError.hide();
+                        $('#nicknameModal').modal('hide');
+                        socket.emit('join');
+                    } else {
+                        nameError.show();
+                    }
+                });
+                nameInput.val('');
+                nameInput.blur();
+            });
+
+            socket.on('usernames', (data) => {
+                $('.users').empty();
+                for (let i=0; i < data.length; i++) {
+                    toBeAppended = `<div class="list-group-item"><span>${data[i]}</span></div>`;
+                    $('.users').append(toBeAppended);
+                };
+            });
+
+            socket.on('number of users', (data) => {
+                $('.userNumber').text(data);
+            })
+
+            msgField.submit((event) => {
+                event.preventDefault(); //prevent page from reloading
+                socket.emit('send message', msg.val(), (data) => {
+                    //add stuff later to deal with callbak
+                    if (data.isValid) {
+                        $('#error').empty();
+                        $('#error').hide();
+                    } else {
+                        $('#error').empty();
+                        $('#error').append($('<p>').text(`${data.msg}. Private message expects the syntax: w/ name msg`));
+                        $('#error').show();
+                    }
+                });
+                msg.val('');
+                return false;
+            });
+
+            socket.on('new message to others', (data) => {
+                toBeAppended = $('<div class="row">').append( $('<div class="col-6" id="msgToOthers">').text(`${data.user}: ${data.msg}`) );
+                chatDisplay.append(toBeAppended);
+                chatDisplay.scrollTop($(this).height());
+            });
+
+            socket.on('new message to self', (data) => {
+                toBeAppended = $('<div class="row">').append( $('<div class="col-6 ml-auto" id="msgToSelf">').text(`${data.msg}`) );
+                chatDisplay.append(toBeAppended);
+                chatDisplay.scrollTop($(this).height());
+            });
+
+            socket.on('whisper', (data) => {
+                toBeAppended = $('<div class="row">').append( $('<div class="col-6" id="whisper">').text(`${data.user} (private): ${data.msg}`) );
+                chatDisplay.append(toBeAppended);
+                chatDisplay.scrollTop($(this).height());
+            });
+
+            socket.on('notification', (data) => {
+                $('#notification').empty();
+                $('#notification').append(`${data.user} ${data.msg}`);
+            });
+
+            //private message window
+            privateMsgRequest.on('submit', (e) => {
+                e.preventDefault();
+                socket.emit('private message request', recipientInput.val(), (data) => {
+                    if (data.isValid) {
+                        privateMsgError.hide();
+                        privateMsgRequest.collapse('hide');
+                        recipientInput.val('');
+                    } else {
+                        privateMsgError.empty();
+                        privateMsgError.text(`${data.msg}`);
+                        privateMsgError.show();
+                        recipientInput.focus();
+                    }
+                });
+            });
+
+            socket.on('private message enabled', (data) => {
+                recipient.text(`To: ${data}`);
+                privateMsgWindow.show();
+            });
+
+            privateMsgForm.submit((event) => {
+                event.preventDefault(); //prevent page from reloading
+                socket.emit('send private message', {recipient: recipient.text().substring(4), msg: privateMsg.val()} );
+                privateMsg.val('');
+            });
+
+            socket.on('private message from sender', (data) => {
+                toBeAppended = $('<div class="row">').append( $('<div class="col-8" id="msgToOthers">').text(`${data.from}: ${data.msg}`) );
+                privateMsgDisplay.append(toBeAppended);
+                privateMsgDisplay.scrollTop($(this).height());
+            });
+
+            socket.on('private message from self', (data) => {
+                toBeAppended = $('<div class="row">').append( $('<div class="col-6 ml-auto" id="msgToSelf">').text(`${data}`) );
+                privateMsgDisplay.append(toBeAppended);
+                privateMsgDisplay.scrollTop($(this).height());
+            });
+            
+            privateMsgClose.on('click', () => {
+                privateMsgWindow.hide();
+            });
+
+            //'user is typing' functionality
+            msg.on('keypress', (event) => {
+                if (event.which != 13) {
+                    socket.emit('typing')
+                }
+                else {
+                    socket.emit('typing ends');
+                }
+            });
+
+            socket.on('display typing', (data) => {
+                sendTypingNotification(data.user);
+            });
+
+            socket.on('remove typing', () => {
+                deleteTypingNotification();
+            });
+
+            function sendTypingNotification(user) {
+                if (chatDisplay.find('#typing').length === 0 ) {
+                    chatDisplay.append(`<div class='row' id='typing'><div class='col-6'>${user} is typing ...</div></div>`)
+                };
+            };
+
+            function deleteTypingNotification() {
+                const typing = $('#typing');
+                typing.remove();
+            };
+        })
+    </script>
+</body>
+</html>
