@@ -1,11 +1,15 @@
-**ChatApp**
+ChatApp
+=======
+A simple chat application using Express and Socket io
 
-A simple chat application using Express and Socket.io
+# Tools
+Build using Node.js, Socket.io, JQuery.
 
-Navigate to the project folder.
+# Run locally
+You can download the code locally and run it at your local machine.
+```
+    npm install
+    npm start
+```
+Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-In the terminal, type "npm install" to download dependency packages.
-
-Then type "npm start" to start the application in a local server.
-
-In the brower, go to http://localhost:3000 to see the app.
