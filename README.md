@@ -1,4 +1,4 @@
-ChatApp
+**ChatApp**
 
 A simple chat application using Express and Socket.io
 
